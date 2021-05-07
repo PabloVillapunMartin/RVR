@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int main(int argc, char** argv){
+int main(int argc, char* argv[]){
 
     if(argc != 4){
         cout << argc << " | El programa debe tener 3 argumentos\n";
@@ -49,7 +49,7 @@ int main(int argc, char** argv){
     memset((void *)buffer, 0, TAM_BUFFER);
 
     //Enviar datos al servidor
-    errorManagement = sendto(sd, &argv[3], sizeof(char) + 1, 0, res->ai_addr, res->ai_addrlen);
+    errorManagement = sendto(sd, argv[3], strlen(argv[3]) + 1, 0, res->ai_addr, res->ai_addrlen);
 
     //Control de errores
     if(errorManagement == -1){
@@ -67,7 +67,7 @@ int main(int argc, char** argv){
     }
 
     //Mostrar la respuesta del servidor
-    cout << buffer;
+    cout << buffer << '\n';
 
     freeaddrinfo(res);
     close(sd);
