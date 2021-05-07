@@ -28,7 +28,7 @@ int main(int argc, char** argv){
 
         getnameinfo(i->ai_addr, i->ai_addrlen, host, NI_MAXHOST, serv, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
 
-        cout << "Host: " << host << " Port: " << serv << '\n';
+        cout << host << "     " << i->ai_family << "     " << i->ai_socktype << '\n';
     }
 
     freeaddrinfo(res);

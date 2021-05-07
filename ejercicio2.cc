@@ -1,9 +1,12 @@
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <time.h>
 #include <unistd.h>
 #include <netdb.h>
 #include <iostream>
 #include <string.h>
+
+#define TAM_BUFFER 80
 
 using namespace std;
 
@@ -42,8 +45,11 @@ int main(int argc, char** argv){
 
     freeaddrinfo(res);
 
-    while(true){
-        char buffer[80];
+    bool server_up = true;
+    while(server_up){
+        char buffer[TAM_BUFFER];
+
+        memset((void *) buffer, 0, TAM_BUFFER);
 
         char host[NI_MAXHOST];
         char serv[NI_MAXSERV];
@@ -64,8 +70,39 @@ int main(int argc, char** argv){
             cerr << "[getnameinfo]\n";
         }
 
-        cout << "Mensaje recibido -> " << "Host: " << host << ", Puerto: " << serv << '\n';
-        cout << "Contenido: " << buffer;
+        cout << bytes << " bytes de " << host << ":" << serv << '\n';
+
+        char buffer_envio[TAM_BUFFER];
+
+        memset((void *) buffer_envio, 0, TAM_BUFFER);   //Limpiar buffer de datos
+
+        //Obtener tiempo del sistema
+        time_t timer = time(NULL);
+        struct tm* tim = localtime(&timer);
+
+        switch (*buffer)
+        {
+            case 't':{  //Enviar hora minutos y segundos
+                strftime(buffer_envio, TAM_BUFFER, "%r", tim);
+                sendto(sd, &buffer_envio, sizeof(time_t), 0, &cliente, clientelen);
+                break;
+            }
+            case 'd':{
+                strftime(buffer_envio, TAM_BUFFER, "%D", tim);
+                sendto(sd, &buffer_envio, sizeof(time_t), 0, &cliente, clientelen);
+                break;
+            }
+            case 'q':{
+                server_up = false;
+                cout << "Cerrando servidor...\n";
+                break;
+            }
+            default:{
+                cout << "Comando no soportado\n";
+                break;
+            }
+        }
+
     }
 
     close(sd);
