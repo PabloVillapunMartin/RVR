@@ -46,8 +46,6 @@ int main(int argc, char** argv){
 
     freeaddrinfo(res);
 
-    cout << "Listening...\n";
-
     //Esperando conexion
     listen(sd, 16);
 

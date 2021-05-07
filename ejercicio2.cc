@@ -57,7 +57,7 @@ int main(int argc, char** argv){
         struct sockaddr cliente;
         socklen_t clientelen = sizeof(struct sockaddr);
 
-        int bytes = recvfrom(sd, (void*) buffer, 80, 0, &cliente, &clientelen);
+        int bytes = recvfrom(sd, (void*) buffer, TAM_BUFFER, 0, &cliente, &clientelen);
 
         if(bytes == -1){
             cerr << "Error en recvfrom\n"; 
