@@ -60,7 +60,7 @@ int main(int argc, char** argv){
         int bytes = recvfrom(sd, (void*) buffer, TAM_BUFFER, 0, &cliente, &clientelen);
 
         if(bytes == -1){
-            cerr << "Error en recvfrom\n"; 
+            cerr << "[recvfrom]\n"; 
             return -1;
         }
 
@@ -68,6 +68,7 @@ int main(int argc, char** argv){
 
         if(errorManagement == -1){
             cerr << "[getnameinfo]\n";
+            return -1;
         }
 
         cout << bytes << " bytes de " << host << ":" << serv << '\n';
