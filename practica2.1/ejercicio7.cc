@@ -85,7 +85,7 @@ int main(int argc, char** argv){
     struct sockaddr cliente;
     socklen_t clientelen = sizeof(struct sockaddr);
 
-    while(t){
+    while(true){
         //Aceptar conexion y recoger datos del cliente
         int id_cliente = accept(sd, &cliente, &clientelen);
         ThreadMessage* tm = new ThreadMessage(id_cliente);
