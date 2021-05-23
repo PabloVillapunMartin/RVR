@@ -70,6 +70,21 @@ public:
      */
     void do_messages();
 
+    /**
+     *  Metodo para comprobar si el socket ya se encuentra en el vector de clientes o no
+     */
+    bool isAlreadyRegistered(Socket* client);
+
+    /**
+     * Metodo para eliminar a un cliente que del vector
+     */
+    void removeClient(Socket* client);
+
+    /**
+     * Metodo para enviar un mensaje a todos los clientes excepto al que lo envio inicialmente
+     */
+    void sendMessageToAllCLients(Socket* senderClient, ChatMessage* message);
+
 private:
     /**
      *  Lista de clientes conectados al servidor de Chat, representados por

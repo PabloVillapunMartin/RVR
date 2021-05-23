@@ -61,6 +61,10 @@ void ChatServer::do_messages()
             return;
         }
 
+        //Recibir Mensajes en y en función del tipo de mensaje
+        // - LOGIN: Añadir al vector clients
+        // - LOGOUT: Eliminar del vector clients
+        // - MESSAGE: Reenviar el mensaje a todos los clientes (menos el emisor)
         switch (message->type)
         {
             case ChatMessage::MessageType::LOGIN :{
@@ -85,11 +89,6 @@ void ChatServer::do_messages()
                 std::cout << "Received unknown message type\n";
                 break;
         }
-
-        //Recibir Mensajes en y en función del tipo de mensaje
-        // - LOGIN: Añadir al vector clients
-        // - LOGOUT: Eliminar del vector clients
-        // - MESSAGE: Reenviar el mensaje a todos los clientes (menos el emisor)
     }
 }
 
@@ -113,7 +112,7 @@ void ChatServer::removeClient(Socket* client){
 
 void ChatServer::sendMessageToAllCLients(Socket* senderClient, ChatMessage* message){
     for(int i = 0; i < clients.size(); ++i){
-        if(*clients[i].get() == *senderClient) continue;
+        if(*clients[i].get() == *senderClient) continue;    //No enviar al cliente origen del mensaje
         socket.send(*message, *clients[i].get());
     }
 }
@@ -133,7 +132,12 @@ void ChatClient::login()
 
 void ChatClient::logout()
 {
-    // Completar
+    std::string msg;
+
+    ChatMessage em(nick, msg);
+    em.type = ChatMessage::LOGOUT;
+
+    socket.send(em, socket);
 }
 
 void ChatClient::input_thread()
@@ -142,6 +146,14 @@ void ChatClient::input_thread()
     {
         // Leer stdin con std::getline
         // Enviar al servidor usando socket
+        std::string input;
+        ChatMessage msg;
+        msg.type = ChatMessage::MESSAGE;
+        msg.nick = nick;
+
+        std::getline(std::cin, input);
+        msg.message = input;
+        socket.send(msg, socket);
     }
 }
 
@@ -151,6 +163,11 @@ void ChatClient::net_thread()
     {
         //Recibir Mensajes de red
         //Mostrar en pantalla el mensaje de la forma "nick: mensaje"
+        ChatMessage msg;
+        
+        socket.recv(msg);
+
+        std::cout << msg.nick << ": " << msg.message << '\n';
     }
 }
 
