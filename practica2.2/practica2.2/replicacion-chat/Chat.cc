@@ -15,10 +15,10 @@ void ChatMessage::to_bin()
     memcpy(bufferPointer, &type, sizeof(uint8_t));
     bufferPointer += sizeof(uint8_t);
 
-    memcpy(bufferPointer, &nick, 8 * sizeof(char));
+    memcpy(bufferPointer, nick.c_str(), 8 * sizeof(char));
     bufferPointer += 8 * sizeof(char);
 
-    memcpy(bufferPointer, &message, 80 * sizeof(char));
+    memcpy(bufferPointer, message.c_str(), 80 * sizeof(char));
 }
 
 int ChatMessage::from_bin(char * bobj)
@@ -30,13 +30,18 @@ int ChatMessage::from_bin(char * bobj)
     //Reconstruir la clase usando el buffer _data
     char* bufferPointer = _data;
 
-    memcpy(&type, &bufferPointer, sizeof(uint8_t));
+    memcpy(&type, bufferPointer, sizeof(uint8_t));
     bufferPointer += sizeof(uint8_t);
 
-    mempcpy(&nick, &bufferPointer, 8 * sizeof(char));
+    char buffNick[8];
+    mempcpy(&buffNick, bufferPointer, 8 * sizeof(char));
     bufferPointer += 8 * sizeof(char);
+    nick = buffNick;
 
-    memcpy(&message, &bufferPointer, 80 * sizeof(char));
+    char buffMessage[80];
+    memcpy(&buffMessage, bufferPointer, 80 * sizeof(char));
+    message = buffMessage;
+    
 
     return 0;
 }
@@ -53,7 +58,7 @@ void ChatServer::do_messages()
          * crear un unique_ptr con el objeto socket recibido y usar std::move
          * para añadirlo al vector
          */
-        ChatMessage* message;
+        ChatMessage* message = new ChatMessage();
         Socket* clientSocket;
 
         if(socket.recv(*message, clientSocket) != 0){
@@ -113,7 +118,7 @@ void ChatServer::removeClient(Socket* client){
 void ChatServer::sendMessageToAllCLients(Socket* senderClient, ChatMessage* message){
     for(int i = 0; i < clients.size(); ++i){
         if(*clients[i].get() == *senderClient) continue;    //No enviar al cliente origen del mensaje
-        socket.send(*message, *clients[i].get());
+        socket.send(*message, *clients[i]);
     }
 }
 
@@ -152,6 +157,7 @@ void ChatClient::input_thread()
         msg.nick = nick;
 
         std::getline(std::cin, input);
+
         msg.message = input;
         socket.send(msg, socket);
     }
