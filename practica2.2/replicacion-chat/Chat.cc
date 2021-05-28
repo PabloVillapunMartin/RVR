@@ -158,6 +158,11 @@ void ChatClient::input_thread()
 
         std::getline(std::cin, input);
 
+        if (input[0] == 'q') {
+            logout();
+            break;
+        }
+
         msg.message = input;
         socket.send(msg, socket);
     }
